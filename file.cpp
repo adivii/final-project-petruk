@@ -325,28 +325,31 @@ void update_book_data(){
 }
 
 void update_request(){
+	// Buat variabel
 	ofstream file_req;
 
 	// Buka file
 	file_req.open("main_database/request_list.txt",ios::out);
 
-	if(file_req.fail()){
+	if(file_req.fail()){ // Cek kegagalan pembukaan file
 		cout << "Error loading database!" << endl;
 		system("pause");
-		exit(0);
+		exit(0); // Terminate program
 	}else{
-		file_req << "" << endl;
-		while(!request_list.isEmpty()){
-			file_req << request_list.getData() << endl;
-			request_list.Dequeue();
+		file_req << "" << endl; // Kosongkan file
+		while(!request_list.isEmpty()){ // Pindahkan isi dari Queue ke dalam file
+			file_req << request_list.getData() << endl; // Masukkan data paling depan
+			request_list.Dequeue(); // Dequeueu (keluarkan data)
 		}
 	}
 
+	// Tutup file
 	file_req.close();
 
+	// Load request ke dalam queue
 	load_request();
 }
-
+// Sampe sini
 void print_header(){
 	cout << "============================" << endl;
 	cout << "===== Perpustakaan 363 =====" << endl;
