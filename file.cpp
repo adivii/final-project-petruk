@@ -72,7 +72,7 @@ vector<vector<string>> book_data;
 Queue request_list; // Menggunakan Class Queue
 
 // Berfungsi membaca dan memasukkan database (user, request, dan buku)
-void generate_file();
+void generate_file(); // Menggenerate file yang diperlukan (jika belum ada)
 void load_database(); // Membaca data username dan password
 void load_databook(); // Membaca data buku
 void load_request(); // Membaca data request yang dibuat user
@@ -96,8 +96,8 @@ bool validate_username_availability(string _inUser); // Mengecek ketersediaan us
 void submit_account(string _inUser, string _inPass); // Memasukkan data user yang sudah dicek valid, ke dalam database
 
 // Menambahkan buku
-void register_book();
-void submit_book(string _inId, vector<string> _inData);
+void register_book(); // Memasukkan data buku (oleh admin)
+void submit_book(string _inId, vector<string> _inData); // Memasukkan data ke dalam file (oleh sistem)
 
 // Membuat request
 void create_request(string req_type, string username, string req_book); // Membuat request (dari user), dan memasukkan ke dalam daftar request
