@@ -140,12 +140,14 @@ void generate_file(){
 	file_pass.open("main_database/password.txt", ios::app);
 	file_req.open("main_database/request_list.txt", ios::app);
 
+	// Mengecek jika ada file yang tidak berhasil dibuka (dan tidak dapat dibuat)
 	if(file_book_data.fail() || file_book_id.fail() || file_user.fail() || file_pass.fail() || file_req.fail()){
 		cout << "Error loading database!" << endl;
 		system("pause");
 		exit(0); // To terminate program
 	}
 
+	// Menutup file
 	file_book_data.close();
 	file_book_id.close();
 	file_user.close();
