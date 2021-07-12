@@ -2,7 +2,7 @@
 // username : adiwijaya
 // password : ilkomp2020
 
-// Add fungsi nambahin data buku (by admin)
+// Just a little tips from me, put this file in a separated folder :)
 
 #include <bits/stdc++.h>
 using namespace std;
