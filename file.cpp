@@ -2,6 +2,8 @@
 // username : adiwijaya
 // password : ilkomp2020
 
+// Add fungsi nambahin data buku (by admin)
+
 #include <bits/stdc++.h>
 using namespace std;
 
@@ -70,6 +72,7 @@ vector<vector<string>> book_data;
 Queue request_list; // Menggunakan Class Queue
 
 // Berfungsi membaca dan memasukkan database (user, request, dan buku)
+void generate_file();
 void load_database(); // Membaca data username dan password
 void load_databook(); // Membaca data buku
 void load_request(); // Membaca data request yang dibuat user
@@ -92,6 +95,10 @@ void register_account(); // Membuat akun
 bool validate_username_availability(string _inUser); // Mengecek ketersediaan username (tidak duplicate)
 void submit_account(string _inUser, string _inPass); // Memasukkan data user yang sudah dicek valid, ke dalam database
 
+// Menambahkan buku
+void register_book();
+void submit_book(string _inId, vector<string> _inData);
+
 // Membuat request
 void create_request(string req_type, string username, string req_book); // Membuat request (dari user), dan memasukkan ke dalam daftar request
 void pinjam_buku(string _inUser, string _inId); // Membuat request pinjam buku
@@ -108,12 +115,42 @@ string removeWhitespace(string _inStr); // Menghilangkan spasi
 
 int main(){
 	// Membaca database
+	generate_file();
 	load_database();
 	load_databook();
 	load_request();
 	
 	// Membuka start menu
 	start_menu();
+}
+
+void generate_file(){
+	ofstream file_book_data, file_book_id, file_user, file_pass, file_req;
+
+	// Membuat folder yang diperlukan
+	system("mkdir main_database");
+	system("mkdir user_log");
+	system("mkdir user_request");
+	system("mkdir user_book");
+
+	// Membuat file (membuka saja jika file sudah ada)
+	file_book_data.open("main_database/book_data.txt", ios::app);
+	file_book_id.open("main_database/book_id.txt", ios::app);
+	file_user.open("main_database/username.txt", ios::app);
+	file_pass.open("main_database/password.txt", ios::app);
+	file_req.open("main_database/request_list.txt", ios::app);
+
+	if(file_book_data.fail() || file_book_id.fail() || file_user.fail() || file_pass.fail() || file_req.fail()){
+		cout << "Error loading database!" << endl;
+		system("pause");
+		exit(0); // To terminate program
+	}
+
+	file_book_data.close();
+	file_book_id.close();
+	file_user.close();
+	file_pass.close();
+	file_req.close();
 }
 
 void load_database(){
@@ -344,10 +381,15 @@ void main_menu(string _inUser){
 	while(true){
 		system("cls");
 		print_header();
-		cout << "ID      : " << *book_id_it << endl;
-		cout << "Judul   : " << (*book_data_it)[0] << endl;
-		cout << "Penulis : " << (*book_data_it)[1] << endl;
-		cout << "Status  : " << (*book_data_it)[2] << endl;
+		if(book_id.empty()){
+			cout << "No Data!" << endl;
+		}else{
+			cout << "ID      : " << *book_id_it << endl;
+			cout << "Judul   : " << (*book_data_it)[0] << endl;
+			cout << "Penulis : " << (*book_data_it)[1] << endl;
+			cout << "Status  : " << (*book_data_it)[2] << endl;
+		}
+
 		cout << "============================" << endl;
 		cout << "Ketik \"next\" tanpa tanda petik untuk melihat buku selanjutnya" << endl;
 		cout << "Ketik \"back\" tanpa tanda petik untuk melihat buku sebelumnya" << endl;
@@ -358,25 +400,45 @@ void main_menu(string _inUser){
 		cout << "=> "; getline(cin,choose);
 
 		if(removeWhitespace(choose) == "next"){
-			book_id_it++;
-			book_data_it++;
-			
-			if(book_id_it == book_id.end() || book_data_it == book_data.end()){
-				book_id_it = book_id.begin();
-				book_data_it = book_data.begin();
+			if(!book_id.empty()){
+				book_id_it++;
+				book_data_it++;
+				
+				if(book_id_it == book_id.end() || book_data_it == book_data.end()){
+					book_id_it = book_id.begin();
+					book_data_it = book_data.begin();
+				}
+			}else{
+				cout << "No Data!" << endl;
+				system("pause");
 			}
 		}else if(removeWhitespace(choose) == "back"){
-			if(book_id_it == book_id.begin() || book_data_it == book_data.begin()){
-				book_id_it = book_id.end()-1;
-				book_data_it = book_data.end()-1;
+			if(!book_id.empty()){
+				if(book_id_it == book_id.begin() || book_data_it == book_data.begin()){
+					book_id_it = book_id.end()-1;
+					book_data_it = book_data.end()-1;
+				}else{
+					book_id_it--;
+					book_data_it--;
+				}
 			}else{
-				book_id_it--;
-				book_data_it--;
+				cout << "No Data!" << endl;
+				system("pause");
 			}
 		}else if(removeWhitespace(choose) == "pinjam"){
-			pinjam_buku(_inUser,*book_id_it);
+			if(!book_id.empty()){
+				pinjam_buku(_inUser,*book_id_it);
+			}else{
+				cout << "No Data!" << endl;
+				system("pause");
+			}
 		}else if(removeWhitespace(choose) == "kembalikan"){
-			kembalikan_buku(_inUser);
+			if(!book_id.empty()){
+				kembalikan_buku(_inUser);
+			}else{
+				cout << "No Data!" << endl;
+				system("pause");
+			}
 		}else if(removeWhitespace(choose) == "logout"){
 			start_menu();
 		}else{
@@ -399,13 +461,9 @@ void admin_menu(){
 		system("cls");
 		print_header();
 		cout << "No Request" << endl;
-		system("pause");
-		start_menu();
 	}else{
 		opened_file.open("user_request/"+current_request_user+".txt");
-	}
 
-	while(!request_list.isEmpty()){
 		if(opened_file.fail()){
 			cout << "Error loading database!" << endl;
 			system("pause");
@@ -430,22 +488,32 @@ void admin_menu(){
 		cout << "Username       : " << current_request_user << endl;
 		cout << "Request Type   : " << get_request_type(req_code) << endl;
 		cout << "Requested Book : " << requested_book_id << endl;
-		cout << "============================" << endl;
-		cout << "Ketik \"proses\" tanpa tanda petik untuk memproses request" << endl;
-		cout << "Ketik \"logout\" tanpa tanda petik untuk logout" << endl;
-		cout << "============================" << endl;
-		cout << "=> ";getline(cin,choose);
+	}
 
-		if(removeWhitespace(choose) == "proses"){
-			proses_request(current_request_user, get_request_type(req_code), requested_book_id);
-		}else if(removeWhitespace(choose) == "logout"){
-			opened_file.close();
-			start_menu();
-		}else{
-			cout << "Wrong Command!" << endl;
+	cout << "============================" << endl;
+	cout << "Ketik \"proses\" tanpa tanda petik untuk memproses request" << endl;
+	cout << "Ketik \"add\" tanpa tanda petik untuk menambahkan data buku baru" << endl;
+	cout << "Ketik \"logout\" tanpa tanda petik untuk logout" << endl;
+	cout << "============================" << endl;
+	cout << "=> ";getline(cin,choose);
+
+	if(removeWhitespace(choose) == "proses"){
+		if(request_list.isEmpty()){
+			cout << "No Request!" << endl;
 			system("pause");
 			admin_menu();
+		}else{
+			proses_request(current_request_user, get_request_type(req_code), requested_book_id);
 		}
+	}else if(removeWhitespace(choose) == "add"){
+		register_book();
+	}else if(removeWhitespace(choose) == "logout"){
+		opened_file.close();
+		start_menu();
+	}else{
+		cout << "Wrong Command!" << endl;
+		system("pause");
+		admin_menu();
 	}
 }
 
@@ -560,6 +628,52 @@ void submit_account(string _inUser, string _inPass){
 
 	file_user.close();
 	file_pass.close();
+}
+
+void register_book(){
+	string judul, penulis;
+	vector<string> data;
+	int id;
+
+	cout << "Judul   : "; getline(cin, judul);
+	cout << "Penulis : "; getline(cin, penulis);
+
+	data.push_back(judul);
+	data.push_back(penulis);
+	data.push_back("Tersedia");
+
+	id = 12051001 + book_id.size();
+
+	submit_book(to_string(id), data);
+	cout << "Data berhasil ditambahkan" << endl;
+	system("pause");
+
+	admin_menu();
+}
+
+void submit_book(string _inId, vector<string> _inData){
+	ofstream file_book_data, file_book_id;
+
+	file_book_id.open("main_database/book_id.txt");
+	file_book_data.open("main_database/book_data.txt");
+
+	if(file_book_id.fail() || file_book_data.fail()){
+		cout << "Error loading database!" << endl;
+		system("pause");
+		exit(0); // To terminate program
+	}else{
+		file_book_id << _inId << endl;
+
+		for(int i = 0;i < 3;i++){
+			file_book_data << _inData[i] << endl;
+		}
+		file_book_data << endl;
+		
+		load_databook();
+	}
+
+	file_book_data.close();
+	file_book_id.close();
 }
 
 void create_request(string req_type, string _inUser, string req_book){
@@ -692,10 +806,10 @@ void proses_request(string _inUser, string req_type, string req_book){
 		file_user << "";
 
 		system("pause");
-		admin_menu();
 	}
 
 	file_user.close();
+	admin_menu();
 }
 
 void give_book(string _inUser, string id){
