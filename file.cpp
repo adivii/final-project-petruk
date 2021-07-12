@@ -263,8 +263,9 @@ void load_databook(){
 	file_book_id.close();
 	file_book_data.close();
 }
-// Sampe sini gaes
+
 void load_request(){
+	// Membuat variabel
 	ifstream file_req;
 	string temp;
 
@@ -274,46 +275,52 @@ void load_request(){
 	// Bersihkan database
 	request_list.clear();
 
-	if(file_req.fail()){
+	if(file_req.fail()){ // Mengecek kegagalan dalam pembukaan file
 		cout << "Error loading database!" << endl;
 		system("pause");
-		exit(0);
+		exit(0); // Terminate program
 	}else{
-		while(!file_req.eof()){
-			getline(file_req,temp);
-			if(removeWhitespace(temp) != ""){
-				request_list.Enqueue(temp);
+		while(!file_req.eof()){ // Baca selama belum mencapai akhir
+			getline(file_req,temp); // Tampung masukan sementara
+			if(removeWhitespace(temp) != ""){ // Cek apakah masukan kosong atau tidak
+				request_list.Enqueue(temp); // Jika tidak kosong, masukkan ke dalam queue
 			}
 		}
 	}
 
+	// Tutup file
 	file_req.close();
 }
 
 void update_book_data(){
+	// Buat variabel
 	ofstream file_book_data;
-
 	vector<vector<string>>::iterator it = book_data.begin();
 
+	// Buka file
 	file_book_data.open("main_database/book_data.txt",ios::out);
 
-	if(file_book_data.fail()){
+	if(file_book_data.fail()){ // Cek kegagalan pembukaan file
 		cout << "Error loading database!" << endl;
 		system("pause");
 		exit(0); // To terminate program
 	}else{
+		// Kosongkan file data buku
 		file_book_data << "" << endl;
+		// Pindahkan isi vector data buku ke dalam file
 		while(it != book_data.end()){
-			for(int i = 0;i < 3;i++){
+			for(int i = 0;i < 3;i++){ // Masukkan 3 data (judul, penulis, dan status)
 				file_book_data << (*it)[i] << endl;
 			}
-			file_book_data << endl;
-			it++;
+			file_book_data << endl; // Berikan 1 baris kosong
+			it++; // Geser iterator
 		}
 	}
 
+	// Tutup file
 	file_book_data.close();
 
+	// Load ulang data buku
 	load_databook();
 }
 
