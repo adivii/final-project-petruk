@@ -67,8 +67,8 @@ public:
 // Global variable
 vector<string> username;
 vector<string> password;
-vector<string> book_id;
-vector<vector<string>> book_data;
+vector<string> book_id; // Berisi genreId dan bookId
+vector<vector<string>> book_data; // Berisi judul, penulis, dan ketersediaan
 Queue request_list; // Menggunakan Class Queue
 
 // Berfungsi membaca dan memasukkan database (user, request, dan buku)
@@ -98,6 +98,8 @@ void submit_account(string _inUser, string _inPass); // Memasukkan data user yan
 // Menambahkan buku
 void register_book(); // Memasukkan data buku (oleh admin)
 void submit_book(string _inId, vector<string> _inData); // Memasukkan data ke dalam file (oleh sistem)
+string chooseGenre(); // Memilih genre buku
+string generateRandomCode(int length); // Membuat kode random yang digunakan dalam ID
 
 // Membuat request
 void create_request(string req_type, string username, string req_book); // Membuat request (dari user), dan memasukkan ke dalam daftar request
@@ -114,7 +116,6 @@ void take_book(string _inUser, string id); // Memproses pengembalian
 string removeWhitespace(string _inStr); // Menghilangkan spasi
 void clearScreen(); // Membersihkan layar
 void pauseConsole(); // Menjeda console untuk menunggu respons user
-string generateRandomCode(int length); // Membuat kode random yang digunakan dalam ID
 long randomNumber(long begin, long end); // Menggenerate angka random
 
 int main(){
@@ -648,8 +649,8 @@ void submit_account(string _inUser, string _inPass){
 
 void register_book(){
 	string judul, penulis;
+	string id, genre;
 	vector<string> data;
-	string id;
 
 	clearScreen();
 	print_header();
@@ -660,13 +661,42 @@ void register_book(){
 	data.push_back(penulis);
 	data.push_back("Tersedia");
 
-	id = generateRandomCode(12);
+	id = generateRandomCode(8);
+	genre = chooseGenre();
 
-	submit_book(id, data);
+	submit_book(genre+"-"+id, data);
 	cout << "Data berhasil ditambahkan" << endl;
 	pauseConsole();
 
 	admin_menu();
+}
+
+string chooseGenre(){
+	string choose;
+	clearScreen();
+	print_header();
+	cout << "Pilihan Genre :" << endl;
+	cout << "(001) Action" << endl;
+	cout << "(002) Adventure" << endl;
+	cout << "(003) Mystery" << endl;
+	cout << "(004) Fantasy" << endl;
+	cout << "(005) Horror" << endl;
+	cout << "(006) Thriller" << endl;
+	cout << "(007) Psychological" << endl;
+	cout << "(008) Comic" << endl;
+	cout << "(009) Drama" << endl;
+	cout << "(010) Non-Fiction" << endl;
+	cout << "(011) Other" << endl;
+	cout << "============================" << endl;
+	cout << "=> ";getline(cin,choose);
+	// Jika sesuai dengan pilihan diatas, kembalikan kode yang dipilih
+	if(choose == "001" || choose == "002" || choose == "003" || choose == "004" || choose == "005" || choose == "006" || choose == "007" || choose == "008" || choose == "009" || choose == "010" || choose == "011"){
+		return choose;
+	}else{ // Jika tidak sesuai dengan pilihan
+		cout << "Wrong Command!" << endl;
+		pauseConsole();
+		return chooseGenre(); // Lakukan rekursi
+	}
 }
 
 void submit_book(string _inId, vector<string> _inData){
