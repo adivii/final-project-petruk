@@ -82,7 +82,8 @@ void update_request(); // Memperbarui data request dari user
 // Menu dan template
 void print_header(); // Template header
 void start_menu(); // Menu awal (berisi login dan register)
-void main_menu(); // Menu utama (untuk peminjaman dan pengembalian oleh user)
+void main_menu(string _inUser); // Menu utama (untuk peminjaman dan pengembalian oleh user)
+void filtered_menu(string _inUser); // Menampilkan daftar buku berdasarkan filter yang diterapkan
 void admin_menu(); // Menu admin (untuk memproses request dari user)
 
 // Berfungsi untuk login
@@ -101,6 +102,8 @@ void submit_book(string _inId, vector<string> _inData); // Memasukkan data ke da
 string chooseGenre(); // Memilih genre buku
 string generateRandomCode(int length); // Membuat kode random yang digunakan dalam ID
 
+// Modifikasi data buku
+
 // Membuat request
 void create_request(string req_type, string username, string req_book); // Membuat request (dari user), dan memasukkan ke dalam daftar request
 void pinjam_buku(string _inUser, string _inId); // Membuat request pinjam buku
@@ -117,6 +120,7 @@ string removeWhitespace(string _inStr); // Menghilangkan spasi
 void clearScreen(); // Membersihkan layar
 void pauseConsole(); // Menjeda console untuk menunggu respons user
 long randomNumber(long begin, long end); // Menggenerate angka random
+vector<string> splitString(string input, string delimiter); // Memecah string berdasarkan delimiter
 
 int main(){
 	// Membaca database
@@ -410,6 +414,7 @@ void main_menu(string _inUser){
 		cout << "============================" << endl;
 		cout << "Ketik \"next\" tanpa tanda petik untuk melihat buku selanjutnya" << endl;
 		cout << "Ketik \"back\" tanpa tanda petik untuk melihat buku sebelumnya" << endl;
+		cout << "Ketik \"filter\" tanpa tanda petik untuk memfilter buku berdasarkan genre" << endl;
 		cout << "Ketik \"pinjam\" tanpa tanda petik untuk meminjam buku ini" << endl;
 		cout << "Ketik \"kembalikan\" tanpa tanda petik untuk mengembalikan buku yang sedang dipinjam" << endl;
 		cout << "Ketik \"logout\" tanpa tanda petik untuk logout" << endl;
@@ -442,9 +447,99 @@ void main_menu(string _inUser){
 				cout << "No Data!" << endl;
 				pauseConsole();
 			}
+		}else if(removeWhitespace(choose) == "filter"){
+			filtered_menu(_inUser);
 		}else if(removeWhitespace(choose) == "pinjam"){
 			if(!book_id.empty()){
 				pinjam_buku(_inUser,*book_id_it);
+			}else{
+				cout << "No Data!" << endl;
+				pauseConsole();
+			}
+		}else if(removeWhitespace(choose) == "kembalikan"){
+			if(!book_id.empty()){
+				kembalikan_buku(_inUser);
+			}else{
+				cout << "No Data!" << endl;
+				pauseConsole();
+			}
+		}else if(removeWhitespace(choose) == "logout"){
+			start_menu();
+		}else{
+			cout << "Wrong Command!" << endl;
+			pauseConsole();
+		}
+	}
+}
+
+void filtered_menu(string _inUser){
+	string genre;
+	genre = chooseGenre(); // Dapatkan id genre yg ingin difilter
+
+	vector<string>::iterator it = book_id.begin(); // Untuk mengiterasi book_id
+	vector<string> filtered_id; // Menampung id yang terfilter
+	vector<vector<string>> filtered_data; // Menampung data yang terfilter
+	string choose; // Pilihan menu
+
+	while(it != book_id.end()){ // Selama belum mencapai akhir id keseluruhan
+		if((splitString(*it,"-"))[0] == genre){ // Cek apakah id genre buku yang dicek sekarang sesuai dengan id genre filter
+			filtered_id.push_back(*it); // Jika sama, masukkan id buku ke variabel penampung
+			filtered_data.push_back(book_data[it-book_id.begin()]); // masukkan juga data buku
+		}
+		it++;
+	}
+
+	it = filtered_id.begin();
+
+	while(true){
+		clearScreen(); // Bersihkan layar
+		print_header(); // Tampilan header
+		if(filtered_id.empty()){
+			cout << "No Data!" << endl;
+		}else{
+			cout << "ID      : " << *it << endl;
+			cout << "Judul   : " << filtered_data[it-filtered_id.begin()][0] << endl;
+			cout << "Penulis : " << filtered_data[it-filtered_id.begin()][1] << endl;
+			cout << "Status  : " << filtered_data[it-filtered_id.begin()][2] << endl;
+		}
+
+		cout << "============================" << endl;
+		cout << "Ketik \"next\" tanpa tanda petik untuk melihat buku selanjutnya" << endl;
+		cout << "Ketik \"back\" tanpa tanda petik untuk melihat buku sebelumnya" << endl;
+		cout << "Ketik \"all\" tanpa tanda petik untuk melihat semua buku" << endl;
+		cout << "Ketik \"pinjam\" tanpa tanda petik untuk meminjam buku ini" << endl;
+		cout << "Ketik \"kembalikan\" tanpa tanda petik untuk mengembalikan buku yang sedang dipinjam" << endl;
+		cout << "Ketik \"logout\" tanpa tanda petik untuk logout" << endl;
+		cout << "============================" << endl;
+		cout << "=> "; getline(cin,choose);
+
+		if(removeWhitespace(choose) == "next"){
+			if(!filtered_id.empty()){
+				it++;
+
+				if(it == filtered_id.end()){
+					it = filtered_id.begin();
+				}
+			}else{
+				cout << "No Data!" << endl;
+				pauseConsole();
+			}
+		}else if(removeWhitespace(choose) == "back"){
+			if(!filtered_id.empty()){
+				if(it == filtered_id.begin()){
+					it = filtered_id.end()-1;
+				}else{
+					it--;
+				}
+			}else{
+				cout << "No Data!" << endl;
+				pauseConsole();
+			}
+		}else if(removeWhitespace(choose) == "all"){
+			main_menu(_inUser);
+		}else if(removeWhitespace(choose) == "pinjam"){
+			if(!book_id.empty()){
+				pinjam_buku(_inUser,*it);
 			}else{
 				cout << "No Data!" << endl;
 				pauseConsole();
@@ -966,4 +1061,31 @@ string generateRandomCode(int length){
 	}
 
 	return result; // Kembalikan hasil
+}
+
+vector<string> splitString(string input, string delimiter){
+	// Container untuk hasil pemisahan
+	vector<string> result;
+
+	// Start dan end digunakan untuk mengambil substring
+	int start = 0; // Nilai awal untuk start adalah 0
+    int end = input.find(delimiter); // Nilai awal untuk end adalah pertama kali delimiter ditemukan
+
+    while (end != -1) { // Selama masih ditemukan delimiter
+    	// Ambil substring dari start, sepanjang end - start (dari start sampai end)
+    	// Masukkan substring ke dalam result
+    	// Sebelumnya pastikan bahwa potongan yang diambil memiliki isi (tidak double delimiter)
+    	if(input.substr(start, end - start) != ""){
+        	result.push_back(input.substr(start, end - start));
+        }
+        start = end + delimiter.size(); // Atur nilai start menjadi 1 karakter di depan delimiter
+        end = input.find(delimiter, start); // Setel end menjadi letak delimiter berikutnya
+    }
+    // Setelah delimiter habis, push string terakhir ke dalam vector
+    // Sebelumnya, pastikan masih ada elemen yang disimpan
+    if(input.substr(start, end - start) != ""){
+    	result.push_back(input.substr(start, end - start));
+    }
+
+    return result;
 }
