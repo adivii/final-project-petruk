@@ -112,6 +112,8 @@ void take_book(string _inUser, string id); // Memproses pengembalian
 
 // Lain-lain
 string removeWhitespace(string _inStr); // Menghilangkan spasi
+void clearScreen(); // Membersihkan layar
+void pauseConsole(); // Menjeda console untuk menunggu respons user
 
 int main(){
 	// Membaca database
@@ -119,7 +121,7 @@ int main(){
 	load_database();
 	load_databook();
 	load_request();
-	
+
 	// Membuka start menu
 	start_menu();
 }
@@ -143,7 +145,7 @@ void generate_file(){
 	// Mengecek jika ada file yang tidak berhasil dibuka (dan tidak dapat dibuat)
 	if(file_book_data.fail() || file_book_id.fail() || file_user.fail() || file_pass.fail() || file_req.fail()){
 		cout << "Error loading database!" << endl;
-		system("pause");
+		pauseConsole();
 		exit(0); // To terminate program
 	}
 
@@ -171,7 +173,7 @@ void load_database(){
 
 	if(file_user.fail() || file_pass.fail()){ // Apabila terdapat kesalahan dalam pembukaan file
 		cout << "Error loading database!" << endl;
-		system("pause");
+		pauseConsole();
 		exit(0); // To terminate program
 	}else{
 		// Load isi dari file username.txt
@@ -194,7 +196,7 @@ void load_database(){
 	// Cek jumlah username dan password
 	if(username.size() != password.size()){ // Jika tidak sama (salah satu lebih banyak)
 		cout << "Error! Jumlah username (" << username.size() << ") dan password (" << password.size() << ") tidak sama!" << endl;
-		system("pause");
+		pauseConsole();
 		exit(0); // Terminate program
 	}
 
@@ -222,7 +224,7 @@ void load_databook(){
 	// Mengecek kegagalan load pada salah satu file
 	if(file_book_id.fail() || file_book_data.fail()){
 		cout << "Error loading database!" << endl;
-		system("pause");
+		pauseConsole();
 		exit(0); // To terminate program
 	}else{
 		while(!file_book_id.eof()){ // Membaca selama masih ada masukan
@@ -255,7 +257,7 @@ void load_databook(){
 	// Mengecek jumlah id dan data
 	if(book_id.size() != book_data.size()){ // Jika tidak sama (salah satu lebih banyak), kirimkan pesan error
 		cout << "Error! Jumlah id (" << book_id.size() << ") dan data (" << book_data.size() << ") buku tidak sama!" << endl;
-		system("pause");
+		pauseConsole();
 		exit(0);
 	}
 
@@ -277,7 +279,7 @@ void load_request(){
 
 	if(file_req.fail()){ // Mengecek kegagalan dalam pembukaan file
 		cout << "Error loading database!" << endl;
-		system("pause");
+		pauseConsole();
 		exit(0); // Terminate program
 	}else{
 		while(!file_req.eof()){ // Baca selama belum mencapai akhir
@@ -302,7 +304,7 @@ void update_book_data(){
 
 	if(file_book_data.fail()){ // Cek kegagalan pembukaan file
 		cout << "Error loading database!" << endl;
-		system("pause");
+		pauseConsole();
 		exit(0); // To terminate program
 	}else{
 		// Kosongkan file data buku
@@ -333,7 +335,7 @@ void update_request(){
 
 	if(file_req.fail()){ // Cek kegagalan pembukaan file
 		cout << "Error loading database!" << endl;
-		system("pause");
+		pauseConsole();
 		exit(0); // Terminate program
 	}else{
 		file_req << "" << endl; // Kosongkan file
@@ -360,7 +362,7 @@ void print_header(){
 void start_menu(){
 	string choose;
 
-	system("cls");
+	clearScreen();
 	print_header();
 	cout << "Ketik \"login\" tanpa tanda petik untuk login ke dalam aplikasi" << endl;
 	cout << "Ketik \"admin\" tanpa tanda petik untuk login sebagai admin " << endl;
@@ -379,7 +381,7 @@ void start_menu(){
 		exit(0);
 	}else{
 		cout << "Wrong Command!" << endl;
-		system("pause");
+		pauseConsole();
 		start_menu();
 	}
 }
@@ -391,7 +393,7 @@ void main_menu(string _inUser){
 	string choose;
 
 	while(true){
-		system("cls");
+		clearScreen();
 		print_header();
 		if(book_id.empty()){
 			cout << "No Data!" << endl;
@@ -415,14 +417,14 @@ void main_menu(string _inUser){
 			if(!book_id.empty()){
 				book_id_it++;
 				book_data_it++;
-				
+
 				if(book_id_it == book_id.end() || book_data_it == book_data.end()){
 					book_id_it = book_id.begin();
 					book_data_it = book_data.begin();
 				}
 			}else{
 				cout << "No Data!" << endl;
-				system("pause");
+				pauseConsole();
 			}
 		}else if(removeWhitespace(choose) == "back"){
 			if(!book_id.empty()){
@@ -435,27 +437,27 @@ void main_menu(string _inUser){
 				}
 			}else{
 				cout << "No Data!" << endl;
-				system("pause");
+				pauseConsole();
 			}
 		}else if(removeWhitespace(choose) == "pinjam"){
 			if(!book_id.empty()){
 				pinjam_buku(_inUser,*book_id_it);
 			}else{
 				cout << "No Data!" << endl;
-				system("pause");
+				pauseConsole();
 			}
 		}else if(removeWhitespace(choose) == "kembalikan"){
 			if(!book_id.empty()){
 				kembalikan_buku(_inUser);
 			}else{
 				cout << "No Data!" << endl;
-				system("pause");
+				pauseConsole();
 			}
 		}else if(removeWhitespace(choose) == "logout"){
 			start_menu();
 		}else{
 			cout << "Wrong Command!" << endl;
-			system("pause");
+			pauseConsole();
 		}
 	}
 }
@@ -470,7 +472,7 @@ void admin_menu(){
 	cout << current_request_user << endl;
 
 	if(request_list.isEmpty()){
-		system("cls");
+		clearScreen();
 		print_header();
 		cout << "No Request" << endl;
 	}else{
@@ -478,7 +480,7 @@ void admin_menu(){
 
 		if(opened_file.fail()){
 			cout << "Error loading database!" << endl;
-			system("pause");
+			pauseConsole();
 			exit(0); // To terminate program
 		}
 
@@ -495,7 +497,7 @@ void admin_menu(){
 		opened_file.seekg(4,ios::beg);
 		getline(opened_file,requested_book_id);
 
-		system("cls");
+		clearScreen();
 		print_header();
 		cout << "Username       : " << current_request_user << endl;
 		cout << "Request Type   : " << get_request_type(req_code) << endl;
@@ -512,7 +514,7 @@ void admin_menu(){
 	if(removeWhitespace(choose) == "proses"){
 		if(request_list.isEmpty()){
 			cout << "No Request!" << endl;
-			system("pause");
+			pauseConsole();
 			admin_menu();
 		}else{
 			proses_request(current_request_user, get_request_type(req_code), requested_book_id);
@@ -524,7 +526,7 @@ void admin_menu(){
 		start_menu();
 	}else{
 		cout << "Wrong Command!" << endl;
-		system("pause");
+		pauseConsole();
 		admin_menu();
 	}
 }
@@ -532,7 +534,7 @@ void admin_menu(){
 void login_app(){
 	string user,pass;
 
-	system("cls");
+	clearScreen();
 	print_header();
 	cout << "Username : "; getline(cin,user);
 	cout << "Password : "; getline(cin,pass);
@@ -541,7 +543,7 @@ void login_app(){
 		main_menu(user);
 	}else{
 		cout << "Username atau Password Salah!" << endl;
-		system("pause");
+		pauseConsole();
 		start_menu();
 	}
 }
@@ -549,7 +551,7 @@ void login_app(){
 void login_admin(){
 	string user,pass;
 
-	system("cls");
+	clearScreen();
 	print_header();
 	cout << "Username : "; getline(cin,user);
 	cout << "Password : "; getline(cin,pass);
@@ -558,7 +560,7 @@ void login_admin(){
 		admin_menu();
 	}else{
 		cout << "Username atau Password Salah!" << endl;
-		system("pause");
+		pauseConsole();
 		start_menu();
 	}
 }
@@ -585,7 +587,7 @@ bool validate_account(string _inUser, string _inPass){
 }
 
 void register_account(){
-	system("cls");
+	clearScreen();
 
 	string user, pass;
 
@@ -601,7 +603,7 @@ void register_account(){
 		cout << "Username sudah terpakai!" << endl;
 	}
 
-	system("pause");
+	pauseConsole();
 	start_menu();
 }
 
@@ -610,7 +612,7 @@ bool validate_username_availability(string _inUser){
 
 	it = find(username.begin(), username.end(), _inUser);
 
-	return it == username.end(); // Kembalikan true ketika username tersedia (belum terpakai)	
+	return it == username.end(); // Kembalikan true ketika username tersedia (belum terpakai)
 }
 
 void submit_account(string _inUser, string _inPass){
@@ -621,7 +623,7 @@ void submit_account(string _inUser, string _inPass){
 
 	if(file_user.fail() || file_pass.fail()){
 		cout << "Error Loading File!" << endl;
-		system("pause");
+		pauseConsole();
 		exit(0); // To terminate program
 	}else{
 		file_user << _inUser << endl;
@@ -658,7 +660,7 @@ void register_book(){
 
 	submit_book(to_string(id), data);
 	cout << "Data berhasil ditambahkan" << endl;
-	system("pause");
+	pauseConsole();
 
 	admin_menu();
 }
@@ -671,7 +673,7 @@ void submit_book(string _inId, vector<string> _inData){
 
 	if(file_book_id.fail() || file_book_data.fail()){
 		cout << "Error loading database!" << endl;
-		system("pause");
+		pauseConsole();
 		exit(0); // To terminate program
 	}else{
 		file_book_id << _inId << endl;
@@ -680,7 +682,7 @@ void submit_book(string _inId, vector<string> _inData){
 			file_book_data << _inData[i] << endl;
 		}
 		file_book_data << endl;
-		
+
 		load_databook();
 	}
 
@@ -699,7 +701,7 @@ void create_request(string req_type, string _inUser, string req_book){
 
 		if(file_user.fail() || file_req.fail() || file_log.fail()){
 			cout << "Error Loading Database!" << endl;
-			system("pause");
+			pauseConsole();
 			exit(0);
 		}else{
 			file_req << _inUser << endl;
@@ -714,14 +716,14 @@ void create_request(string req_type, string _inUser, string req_book){
 			file_log << req_code << "#" << req_type << "#" << req_book << endl;
 
 			cout << "Request anda sudah dibuat, mohon tunggu konfirmasi dari admin" << endl;
-			
+
 		}
 		file_user.close();
 	}else{
 		cout << "Mohon tunggu request sebelumnya dikonfirmasi oleh admin" << endl;
 	}
 
-	
+
 	file_req.close();
 	file_log.close();
 
@@ -740,7 +742,7 @@ void pinjam_buku(string _inUser, string _inId){
 
 		if(file_user.fail()){
 			cout << "Error Loading Database!" << endl;
-			system("pause");
+			pauseConsole();
 			exit(0);
 		}else{
 			getline(file_user,temp);
@@ -756,7 +758,7 @@ void pinjam_buku(string _inUser, string _inId){
 		cout << "Buku sedang dipinjam oleh orang lain. Request Tertolak!" << endl;
 	}
 
-	system("pause");
+	pauseConsole();
 	main_menu(_inUser);
 }
 
@@ -768,13 +770,13 @@ void kembalikan_buku(string _inUser){
 
 	if(file_user.fail()){
 		cout << "Error Loading Database!" << endl;
-		system("pause");
+		pauseConsole();
 		exit(0);
 	}else{
 		getline(file_user,id);
 		if(removeWhitespace(id) == ""){
 			cout << "Anda belum meminjam buku apapun!" << endl;
-			system("pause");
+			pauseConsole();
 			main_menu(_inUser);
 		}else{
 			create_request("Pengembalian",_inUser,id);
@@ -783,7 +785,7 @@ void kembalikan_buku(string _inUser){
 
 	file_user.close();
 
-	system("pause");
+	pauseConsole();
 	main_menu(_inUser);
 }
 
@@ -806,7 +808,7 @@ void proses_request(string _inUser, string req_type, string req_book){
 
 	if(file_user.fail()){
 		cout << "Error Loading Database!" << endl;
-		system("pause");
+		pauseConsole();
 		exit(0);
 	}else{
 		if(req_type == "Peminjaman"){
@@ -817,7 +819,7 @@ void proses_request(string _inUser, string req_type, string req_book){
 
 		file_user << "";
 
-		system("pause");
+		pauseConsole();
 	}
 
 	file_user.close();
@@ -834,9 +836,9 @@ void give_book(string _inUser, string id){
 
 		if(file_user.fail()){
 			cout << "Error Loading Database!" << endl;
-			system("pause");
+			pauseConsole();
 			exit(0);
-		}else{			
+		}else{
 			file_user << id << endl;
 			book_data[book_index][2] = "Dipinjam oleh " + _inUser;
 			cout << "Request Berhasil Diproses!" << endl;
@@ -860,7 +862,7 @@ void take_book(string _inUser, string id){
 
 	if(file_book.fail()){
 		cout << "Error Loading Database!" << endl;
-		system("pause");
+		pauseConsole();
 		exit(0);
 	}else{
 		file_book << "";
@@ -889,4 +891,22 @@ string removeWhitespace(string _inStr){
 	}
 
 	return result;
+}
+
+void clearScreen(){
+  cout << "\033[2J\033[1;1H"; // This is a special character that translated into clear screen
+}
+
+void pauseConsole(){
+  // Buat dan set nilai ch menjadi NULL (\0)
+  char ch = '\0';
+
+  cout << "\nPress any key to continue . . . ";
+
+  // Lakukan perulangan selama ch masih NULL
+  do{
+    cin.get(ch); // Baca input user
+  }while (ch == '\0');
+
+  cout << endl;
 }
