@@ -114,6 +114,8 @@ void take_book(string _inUser, string id); // Memproses pengembalian
 string removeWhitespace(string _inStr); // Menghilangkan spasi
 void clearScreen(); // Membersihkan layar
 void pauseConsole(); // Menjeda console untuk menunggu respons user
+string generateRandomCode(int length); // Membuat kode random yang digunakan dalam ID
+long randomNumber(long begin, long end); // Menggenerate angka random
 
 int main(){
 	// Membaca database
@@ -647,7 +649,7 @@ void submit_account(string _inUser, string _inPass){
 void register_book(){
 	string judul, penulis;
 	vector<string> data;
-	int id;
+	string id;
 
 	clearScreen();
 	print_header();
@@ -658,9 +660,9 @@ void register_book(){
 	data.push_back(penulis);
 	data.push_back("Tersedia");
 
-	id = 12051001 + book_id.size();
+	id = generateRandomCode(12);
 
-	submit_book(to_string(id), data);
+	submit_book(id, data);
 	cout << "Data berhasil ditambahkan" << endl;
 	pauseConsole();
 
@@ -911,4 +913,27 @@ void pauseConsole(){
   }while (ch == '\0');
 
   cout << endl;
+}
+
+long randomNumber(long begin, long end){
+  long result; // Untuk menampung hasil
+  long baseAdd; // Basis untuk menggenerate angka
+
+  baseAdd = (end - begin) + 1; // Susun basisnya dengan memperhitungkan rentang antara begin sampai dengan end+1
+  result = rand() % baseAdd; // Generate angka random, lalu modulus dengan basis (hasilnya akan 0 sampai baseAdd-1)
+
+  return result + begin; // Kembalikan nilai hasil generate + begin (hasilnya akan begin sampai begin+(baseAdd-1))
+	// begin+(baseAdd-1) = begin+(end-begin+1-1) = begin + end - begin = end
+	// jadi, nilai yang dikembalikan akan berada pada rentang begin sampai end
+}
+
+string generateRandomCode(int length){
+	string result; // Variabel untuk menampung hasil
+
+	srand(time(NULL)); // Generate seed using time (will change every second)
+	while(result.size() < length){ // Selama belum mencapai panjang yg diminta
+		result.append(to_string(randomNumber(0,9))); // Tempelkan string hasil random ke dalam hasil
+	}
+
+	return result; // Kembalikan hasil
 }
