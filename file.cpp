@@ -670,8 +670,8 @@ void register_book(){
 void submit_book(string _inId, vector<string> _inData){
 	ofstream file_book_data, file_book_id;
 
-	file_book_id.open("main_database/book_id.txt");
-	file_book_data.open("main_database/book_data.txt");
+	file_book_id.open("main_database/book_id.txt",ios::app);
+	file_book_data.open("main_database/book_data.txt",ios::app);
 
 	if(file_book_id.fail() || file_book_data.fail()){
 		cout << "Error loading database!" << endl;
