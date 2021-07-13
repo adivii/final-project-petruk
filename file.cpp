@@ -649,6 +649,8 @@ void register_book(){
 	vector<string> data;
 	int id;
 
+	clearScreen();
+	print_header();
 	cout << "Judul   : "; getline(cin, judul);
 	cout << "Penulis : "; getline(cin, penulis);
 
