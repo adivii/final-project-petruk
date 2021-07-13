@@ -1,3 +1,4 @@
+// Latest Version can be accessed at : https://github.com/adivii/final-project-petruk.git
 // Admin account :
 // username : adiwijaya
 // password : ilkomp2020
@@ -84,11 +85,13 @@ void print_header(); // Template header
 void start_menu(); // Menu awal (berisi login dan register)
 void main_menu(string _inUser); // Menu utama (untuk peminjaman dan pengembalian oleh user)
 void filtered_menu(string _inUser); // Menampilkan daftar buku berdasarkan filter yang diterapkan
+
+// Fitur Admin
+void login_admin(); // Login admin
 void admin_menu(); // Menu admin (untuk memproses request dari user)
 
 // Berfungsi untuk login
 void login_app(); // Login user
-void login_admin(); // Login admin
 bool validate_account(string _inUser, string _inPass); // Memvalidasi akun user
 
 // Mendaftar akun
