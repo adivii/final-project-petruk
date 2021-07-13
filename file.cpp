@@ -106,6 +106,10 @@ string chooseGenre(); // Memilih genre buku
 string generateRandomCode(int length); // Membuat kode random yang digunakan dalam ID
 
 // Modifikasi data buku
+void modificationMenu();
+void filtered_modificationMenu();
+void deleteBook(string _inId);
+void editBookData(string _inId);
 
 // Membuat request
 void create_request(string req_type, string username, string req_book); // Membuat request (dari user), dan memasukkan ke dalam daftar request
@@ -306,19 +310,29 @@ void load_request(){
 
 void update_book_data(){
 	// Buat variabel
-	ofstream file_book_data;
+	ofstream file_book_id, file_book_data;
 	vector<vector<string>>::iterator it = book_data.begin();
+	vector<string>::iterator it_id = book_id.begin();
 
 	// Buka file
+	file_book_id.open("main_database/book_id.txt",ios::out);
 	file_book_data.open("main_database/book_data.txt",ios::out);
 
-	if(file_book_data.fail()){ // Cek kegagalan pembukaan file
+	if(file_book_data.fail() || file_book_id.fail()){ // Cek kegagalan pembukaan file
 		cout << "Error loading database!" << endl;
 		pauseConsole();
 		exit(0); // To terminate program
 	}else{
-		// Kosongkan file data buku
-		file_book_data << "" << endl;
+		// Kosongkan file id dan data buku
+		file_book_id << "";
+		file_book_data << "";
+
+		// Pindahkan isi vector id buku ke dalam file
+		while(it_id != book_id.end()){
+			file_book_id << *it_id << endl;
+			it_id++;
+		}
+
 		// Pindahkan isi vector data buku ke dalam file
 		while(it != book_data.end()){
 			for(int i = 0;i < 3;i++){ // Masukkan 3 data (judul, penulis, dan status)
@@ -330,6 +344,7 @@ void update_book_data(){
 	}
 
 	// Tutup file
+	file_book_id.close();
 	file_book_data.close();
 
 	// Load ulang data buku
@@ -608,6 +623,7 @@ void admin_menu(){
 	cout << "============================" << endl;
 	cout << "Ketik \"proses\" tanpa tanda petik untuk memproses request" << endl;
 	cout << "Ketik \"add\" tanpa tanda petik untuk menambahkan data buku baru" << endl;
+	cout << "Ketik \"edit\" tanpa tanda petik untuk memodifikasi data buku" << endl;
 	cout << "Ketik \"logout\" tanpa tanda petik untuk logout" << endl;
 	cout << "============================" << endl;
 	cout << "=> ";getline(cin,choose);
@@ -622,6 +638,8 @@ void admin_menu(){
 		}
 	}else if(removeWhitespace(choose) == "add"){
 		register_book();
+	}else if(removeWhitespace(choose) == "edit"){
+		modificationMenu();
 	}else if(removeWhitespace(choose) == "logout"){
 		opened_file.close();
 		start_menu();
@@ -794,6 +812,207 @@ string chooseGenre(){
 		cout << "Wrong Command!" << endl;
 		pauseConsole();
 		return chooseGenre(); // Lakukan rekursi
+	}
+}
+
+void modificationMenu(){
+	vector<string>::iterator book_id_it = book_id.begin();
+	vector<vector<string>>::iterator book_data_it = book_data.begin();
+
+	string choose;
+
+	while(true){
+		clearScreen();
+		print_header();
+		if(book_id.empty()){
+			cout << "No Data!" << endl;
+		}else{
+			cout << "ID      : " << *book_id_it << endl;
+			cout << "Judul   : " << (*book_data_it)[0] << endl;
+			cout << "Penulis : " << (*book_data_it)[1] << endl;
+			cout << "Status  : " << (*book_data_it)[2] << endl;
+		}
+
+		cout << "============================" << endl;
+		cout << "Ketik \"next\" tanpa tanda petik untuk melihat buku selanjutnya" << endl;
+		cout << "Ketik \"back\" tanpa tanda petik untuk melihat buku sebelumnya" << endl;
+		cout << "Ketik \"filter\" tanpa tanda petik untuk memfilter buku berdasarkan genre" << endl;
+		cout << "Ketik \"edit\" tanpa tanda petik untuk mengubah data buku" << endl;
+		cout << "Ketik \"delete\" tanpa tanda petik untuk menghapus buku" << endl;
+		cout << "Ketik \"exit\" tanpa tanda petik untuk kembali ke menu admin" << endl;
+		cout << "============================" << endl;
+		cout << "=> "; getline(cin,choose);
+
+		if(removeWhitespace(choose) == "next"){
+			if(!book_id.empty()){
+				book_id_it++;
+				book_data_it++;
+
+				if(book_id_it == book_id.end() || book_data_it == book_data.end()){
+					book_id_it = book_id.begin();
+					book_data_it = book_data.begin();
+				}
+			}else{
+				cout << "No Data!" << endl;
+				pauseConsole();
+			}
+		}else if(removeWhitespace(choose) == "back"){
+			if(!book_id.empty()){
+				if(book_id_it == book_id.begin() || book_data_it == book_data.begin()){
+					book_id_it = book_id.end()-1;
+					book_data_it = book_data.end()-1;
+				}else{
+					book_id_it--;
+					book_data_it--;
+				}
+			}else{
+				cout << "No Data!" << endl;
+				pauseConsole();
+			}
+		}else if(removeWhitespace(choose) == "filter"){
+			filtered_modificationMenu();
+		}else if(removeWhitespace(choose) == "edit"){
+			if(!book_id.empty()){
+
+			}else{
+				cout << "No Data!" << endl;
+				pauseConsole();
+			}
+		}else if(removeWhitespace(choose) == "delete"){
+			if(!book_id.empty()){
+				deleteBook(*book_id_it);
+			}else{
+				cout << "No Data!" << endl;
+				pauseConsole();
+			}
+		}else if(removeWhitespace(choose) == "exit"){
+			admin_menu();
+		}else{
+			cout << "Wrong Command!" << endl;
+			pauseConsole();
+		}
+	}
+}
+
+void filtered_modificationMenu(){
+	string genre;
+	genre = chooseGenre(); // Dapatkan id genre yg ingin difilter
+
+	vector<string>::iterator it = book_id.begin(); // Untuk mengiterasi book_id
+	vector<string> filtered_id; // Menampung id yang terfilter
+	vector<vector<string>> filtered_data; // Menampung data yang terfilter
+	string choose; // Pilihan menu
+
+	while(it != book_id.end()){ // Selama belum mencapai akhir id keseluruhan
+		if((splitString(*it,"-"))[0] == genre){ // Cek apakah id genre buku yang dicek sekarang sesuai dengan id genre filter
+			filtered_id.push_back(*it); // Jika sama, masukkan id buku ke variabel penampung
+			filtered_data.push_back(book_data[it-book_id.begin()]); // masukkan juga data buku
+		}
+		it++;
+	}
+
+	it = filtered_id.begin();
+
+	while(true){
+		clearScreen(); // Bersihkan layar
+		print_header(); // Tampilan header
+		if(filtered_id.empty()){
+			cout << "No Data!" << endl;
+		}else{
+			cout << "ID      : " << *it << endl;
+			cout << "Judul   : " << filtered_data[it-filtered_id.begin()][0] << endl;
+			cout << "Penulis : " << filtered_data[it-filtered_id.begin()][1] << endl;
+			cout << "Status  : " << filtered_data[it-filtered_id.begin()][2] << endl;
+		}
+
+		cout << "============================" << endl;
+		cout << "Ketik \"next\" tanpa tanda petik untuk melihat buku selanjutnya" << endl;
+		cout << "Ketik \"back\" tanpa tanda petik untuk melihat buku sebelumnya" << endl;
+		cout << "Ketik \"edit\" tanpa tanda petik untuk mengubah data buku" << endl;
+		cout << "Ketik \"delete\" tanpa tanda petik untuk menghapus buku" << endl;
+		cout << "Ketik \"exit\" tanpa tanda petik untuk kembali ke menu admin" << endl;
+		cout << "============================" << endl;
+		cout << "=> "; getline(cin,choose);
+
+		if(removeWhitespace(choose) == "next"){
+			if(!filtered_id.empty()){
+				it++;
+
+				if(it == filtered_id.end()){
+					it = filtered_id.begin();
+				}
+			}else{
+				cout << "No Data!" << endl;
+				pauseConsole();
+			}
+		}else if(removeWhitespace(choose) == "back"){
+			if(!filtered_id.empty()){
+				if(it == filtered_id.begin()){
+					it = filtered_id.end()-1;
+				}else{
+					it--;
+				}
+			}else{
+				cout << "No Data!" << endl;
+				pauseConsole();
+			}
+		}else if(removeWhitespace(choose) == "all"){
+			modificationMenu();
+		}else if(removeWhitespace(choose) == "edit"){
+			if(!filtered_id.empty()){
+
+			}else{
+				cout << "No Data!" << endl;
+				pauseConsole();
+			}
+		}else if(removeWhitespace(choose) == "delete"){
+			if(!filtered_id.empty()){
+				deleteBook(*it);
+			}else{
+				cout << "No Data!" << endl;
+				pauseConsole();
+			}
+		}else if(removeWhitespace(choose) == "exit"){
+			admin_menu();
+		}else{
+			cout << "Wrong Command!" << endl;
+			pauseConsole();
+		}
+	}
+}
+
+void deleteBook(string _inId){
+	int bookId = find(book_id.begin(), book_id.end(), _inId) - book_id.begin();
+
+	vector<string>::iterator it_id = book_id.begin() + bookId;
+	vector<vector<string>>::iterator it_data = book_data.begin() + bookId;
+
+	string choose;
+
+	clearScreen();
+	print_header();
+	cout << "Will delete following book : " << endl;
+	cout << "ID      : " << *it_id << endl;
+	cout << "Judul   : " << (*it_data)[0] << endl;
+	cout << "Penulis : " << (*it_data)[1] << endl;
+	cout << "============================" << endl;
+	cout << "Are you sure? (yes or no)" << endl;
+	cout << "============================" << endl;
+	cout << "=> "; getline(cin, choose);
+
+	if(removeWhitespace(choose) == "yes"){
+		book_id.erase(it_id);
+		book_data.erase(it_data);
+		cout << "Data berhasil dihapus" << endl;
+		pauseConsole();
+		update_book_data();
+		modificationMenu();
+	}else if(removeWhitespace(choose) == "no"){
+		modificationMenu();
+	}else{
+		cout << "Wrong Command" << endl;
+		pauseConsole();
+		deleteBook(_inId);
 	}
 }
 
