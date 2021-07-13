@@ -873,7 +873,7 @@ void modificationMenu(){
 			filtered_modificationMenu();
 		}else if(removeWhitespace(choose) == "edit"){
 			if(!book_id.empty()){
-
+				editBookData(*book_id_it);
 			}else{
 				cout << "No Data!" << endl;
 				pauseConsole();
@@ -928,6 +928,7 @@ void filtered_modificationMenu(){
 		cout << "============================" << endl;
 		cout << "Ketik \"next\" tanpa tanda petik untuk melihat buku selanjutnya" << endl;
 		cout << "Ketik \"back\" tanpa tanda petik untuk melihat buku sebelumnya" << endl;
+		cout << "Ketik \"all\" tanpa tanda petik untuk menampilkan semua buku" << endl;
 		cout << "Ketik \"edit\" tanpa tanda petik untuk mengubah data buku" << endl;
 		cout << "Ketik \"delete\" tanpa tanda petik untuk menghapus buku" << endl;
 		cout << "Ketik \"exit\" tanpa tanda petik untuk kembali ke menu admin" << endl;
@@ -960,7 +961,7 @@ void filtered_modificationMenu(){
 			modificationMenu();
 		}else if(removeWhitespace(choose) == "edit"){
 			if(!filtered_id.empty()){
-
+				editBookData(*it);
 			}else{
 				cout << "No Data!" << endl;
 				pauseConsole();
@@ -1014,6 +1015,33 @@ void deleteBook(string _inId){
 		pauseConsole();
 		deleteBook(_inId);
 	}
+}
+
+void editBookData(string _inId){
+	int bookId = find(book_id.begin(), book_id.end(), _inId) - book_id.begin();
+
+	vector<string>::iterator it_id = book_id.begin() + bookId;
+	vector<vector<string>>::iterator it_data = book_data.begin() + bookId;
+
+	string judul, penulis;
+
+	clearScreen();
+	print_header();
+	cout << "Will modify following book : " << endl;
+	cout << "ID      : " << *it_id << endl;
+	cout << "Judul   : " << (*it_data)[0] << endl;
+	cout << "Penulis : " << (*it_data)[1] << endl;
+	cout << "============================" << endl;
+	cout << "New Data " << endl;
+	cout << "Judul   : "; getline(cin, judul);
+	cout << "Penulis : "; getline(cin, penulis);
+	cout << "============================" << endl;
+	(*it_data)[0] = judul;
+	(*it_data)[1] = penulis;
+	cout << "Data berhasil diubah!" << endl;
+	pauseConsole();
+	update_book_data();
+	modificationMenu();
 }
 
 void submit_book(string _inId, vector<string> _inData){
