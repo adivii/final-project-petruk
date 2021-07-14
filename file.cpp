@@ -1323,23 +1323,23 @@ vector<string> splitString(string input, string delimiter){
 
 	// Start dan end digunakan untuk mengambil substring
 	int start = 0; // Nilai awal untuk start adalah 0
-  int end = input.find(delimiter); // Nilai awal untuk end adalah pertama kali delimiter ditemukan
+	int end = input.find(delimiter); // Nilai awal untuk end adalah pertama kali delimiter ditemukan
 
-  while (end != -1) { // Selama masih ditemukan delimiter
-  	// Ambil substring dari start, sepanjang end - start (dari start sampai end)
-  	// Masukkan substring ke dalam result
-  	// Sebelumnya pastikan bahwa potongan yang diambil memiliki isi (tidak double delimiter)
-  	if(input.substr(start, end - start) != ""){
-      	result.push_back(input.substr(start, end - start));
-      }
-      start = end + delimiter.size(); // Atur nilai start menjadi 1 karakter di depan delimiter
-      end = input.find(delimiter, start); // Setel end menjadi letak delimiter berikutnya
-  }
-  // Setelah delimiter habis, push string terakhir ke dalam vector
-  // Sebelumnya, pastikan masih ada elemen yang disimpan
-  if(input.substr(start, end - start) != ""){
-  	result.push_back(input.substr(start, end - start));
-  }
+	while (end != -1) { // Selama masih ditemukan delimiter
+		// Ambil substring dari start, sepanjang end - start (dari start sampai end)
+		// Masukkan substring ke dalam result
+		// Sebelumnya pastikan bahwa potongan yang diambil memiliki isi (tidak double delimiter)
+		if(input.substr(start, end - start) != ""){
+			result.push_back(input.substr(start, end - start));
+		}
+		start = end + delimiter.size(); // Atur nilai start menjadi 1 karakter di depan delimiter
+		end = input.find(delimiter, start); // Setel end menjadi letak delimiter berikutnya
+	}
+	// Setelah delimiter habis, push string terakhir ke dalam vector
+	// Sebelumnya, pastikan masih ada elemen yang disimpan
+	if(input.substr(start, end - start) != ""){
+		result.push_back(input.substr(start, end - start));
+	}
 
 	return result;
 }
