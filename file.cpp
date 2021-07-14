@@ -106,10 +106,10 @@ string chooseGenre(); // Memilih genre buku
 string generateRandomCode(int length); // Membuat kode random yang digunakan dalam ID
 
 // Modifikasi data buku
-void modificationMenu();
-void filtered_modificationMenu();
-void deleteBook(string _inId);
-void editBookData(string _inId);
+void modificationMenu(); // Menu daftar buku yang ditampilkan dari segi admin
+void filtered_modificationMenu(); // Memfilter menu sebelumnya berdasarkan genre
+void deleteBook(string _inId); // Menghapus buku dengan id yang dikirimkan
+void editBookData(string _inId); // Memodifikasi data buku dengan id yang dikirimkan
 
 // Membuat request
 void create_request(string req_type, string username, string req_book); // Membuat request (dari user), dan memasukkan ke dalam daftar request
@@ -328,9 +328,9 @@ void update_book_data(){
 		file_book_data << "";
 
 		// Pindahkan isi vector id buku ke dalam file
-		while(it_id != book_id.end()){
-			file_book_id << *it_id << endl;
-			it_id++;
+		while(it_id != book_id.end()){ // Ulangi selama masih ada data
+			file_book_id << *it_id << endl; // Masukkan id ke dalam file
+			it_id++; // Geser iterator
 		}
 
 		// Pindahkan isi vector data buku ke dalam file
@@ -376,8 +376,9 @@ void update_request(){
 	// Load request ke dalam queue
 	load_request();
 }
-// Sampe sini
+
 void print_header(){
+	// Tampilkan template header (agar tidak dituliskan berulang-ulang)
 	cout << "============================" << endl;
 	cout << "===== Perpustakaan 363 =====" << endl;
 	cout << "============================" << endl;
@@ -385,10 +386,12 @@ void print_header(){
 }
 
 void start_menu(){
+	// Variabel untuk menampung pilihan user
 	string choose;
 
-	clearScreen();
-	print_header();
+	clearScreen(); // Bersihkan layar
+	print_header(); // Tampilkan header
+	// Tampilkan daftar pilihan menu
 	cout << "Ketik \"login\" tanpa tanda petik untuk login ke dalam aplikasi" << endl;
 	cout << "Ketik \"admin\" tanpa tanda petik untuk login sebagai admin " << endl;
 	cout << "Ketik \"register\" tanpa tanda petik untuk membuat akun" << endl;
@@ -396,6 +399,7 @@ void start_menu(){
 	cout << "============================" << endl;
 	cout << "=> ";getline(cin, choose);
 
+	// Evaluasi menu yang dipilih
 	if(removeWhitespace(choose) == "login"){
 		login_app();
 	}else if(removeWhitespace(choose) == "admin"){
@@ -404,10 +408,10 @@ void start_menu(){
 		register_account();
 	}else if(removeWhitespace(choose) == "exit"){
 		exit(0);
-	}else{
+	}else{ // Jika menu yang dipilih salah
 		cout << "Wrong Command!" << endl;
-		pauseConsole();
-		start_menu();
+		pauseConsole(); // Jeda output console
+		start_menu(); // Lakukan rekursi
 	}
 }
 
@@ -1319,23 +1323,23 @@ vector<string> splitString(string input, string delimiter){
 
 	// Start dan end digunakan untuk mengambil substring
 	int start = 0; // Nilai awal untuk start adalah 0
-    int end = input.find(delimiter); // Nilai awal untuk end adalah pertama kali delimiter ditemukan
+  int end = input.find(delimiter); // Nilai awal untuk end adalah pertama kali delimiter ditemukan
 
-    while (end != -1) { // Selama masih ditemukan delimiter
-    	// Ambil substring dari start, sepanjang end - start (dari start sampai end)
-    	// Masukkan substring ke dalam result
-    	// Sebelumnya pastikan bahwa potongan yang diambil memiliki isi (tidak double delimiter)
-    	if(input.substr(start, end - start) != ""){
-        	result.push_back(input.substr(start, end - start));
-        }
-        start = end + delimiter.size(); // Atur nilai start menjadi 1 karakter di depan delimiter
-        end = input.find(delimiter, start); // Setel end menjadi letak delimiter berikutnya
-    }
-    // Setelah delimiter habis, push string terakhir ke dalam vector
-    // Sebelumnya, pastikan masih ada elemen yang disimpan
-    if(input.substr(start, end - start) != ""){
-    	result.push_back(input.substr(start, end - start));
-    }
+  while (end != -1) { // Selama masih ditemukan delimiter
+  	// Ambil substring dari start, sepanjang end - start (dari start sampai end)
+  	// Masukkan substring ke dalam result
+  	// Sebelumnya pastikan bahwa potongan yang diambil memiliki isi (tidak double delimiter)
+  	if(input.substr(start, end - start) != ""){
+      	result.push_back(input.substr(start, end - start));
+      }
+      start = end + delimiter.size(); // Atur nilai start menjadi 1 karakter di depan delimiter
+      end = input.find(delimiter, start); // Setel end menjadi letak delimiter berikutnya
+  }
+  // Setelah delimiter habis, push string terakhir ke dalam vector
+  // Sebelumnya, pastikan masih ada elemen yang disimpan
+  if(input.substr(start, end - start) != ""){
+  	result.push_back(input.substr(start, end - start));
+  }
 
-    return result;
+	return result;
 }
